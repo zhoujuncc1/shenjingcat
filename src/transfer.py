@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from .cat import _spikeLayer, _poolLayer, spikeLayer
-from .layers import quantize_to_bit
+from .cq import quantize_to_bit
 def transfer_model(src, dst, quantize_bit=32):
     src_dict = src.state_dict()
     dst_dict = dst.state_dict()
