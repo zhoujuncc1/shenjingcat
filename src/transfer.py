@@ -27,13 +27,16 @@ def normalize_weight(model, threshold_scale = 1.0, quantize_bit=32):
         if isinstance(m, nn.Conv3d) and not isinstance(m, _poolLayer):
             print("Normalize: " + str(m))
             factor = torch.max(torch.abs(m.weight))
-            if m.bias is not None and torch.abs(m.bias) > factor:
-                factor = torch.abs(m.bias)
+            
+            if m.bias is not None and torch.max(torch.abs(m.bias)) > factor:
+                factor = torch.max(torch.abs(m.bias))
+
             m.weight /= factor
             m.weight = nn.Parameter(quantize_to_bit(m.weight, quantize_bit))
             if m.bias is not None:
                 m.bias/=factor
-                nn.Parameter(quantize_to_bit(m.bias, quantize_bit))
+                m.bias = nn.Parameter(quantize_to_bit(m.bias, quantize_bit))
+                
         elif isinstance(m, _spikeLayer):
             m.theta = m.theta/factor*threshold_scale
 
