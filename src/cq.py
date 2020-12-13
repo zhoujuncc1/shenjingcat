@@ -28,6 +28,17 @@ class Clamp(nn.Module):
     def forward(self, x):
         return torch.clamp(x, min=self.min, max=self.max)
 
+class Clamp_q(nn.Module):
+    def __init__(self, min=0.0, max=1.0):
+        super(Clamp_q, self).__init__()
+        self.min = min
+        self.max = max
+
+    def forward(self, x):
+        x = torch.clamp(x, min=self.min, max=self.max)
+        x = torch.div(torch.round(torch.mul(x, 100.0)), 100.0)
+        return x
+
 class QuantizedConv2d(nn.Conv2d):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1,
                  padding=0, dilation=1, groups=1,
