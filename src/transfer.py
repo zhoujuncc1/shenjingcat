@@ -113,7 +113,10 @@ def fuse_bn_sequential(block):
                 eps = m.eps
                 mu = bn_st_dict['running_mean']
                 var = bn_st_dict['running_var']
-                gamma = bn_st_dict['weight']
+                if 'weight' in bn_st_dict:
+                    gamma = bn_st_dict['weight']
+                else:
+                    gamma = torch.ones(mu.size(0)).float().to(mu.device)
 
                 if 'bias' in bn_st_dict:
                     beta = bn_st_dict['bias']
