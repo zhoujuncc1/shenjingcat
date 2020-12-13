@@ -174,8 +174,6 @@ def main():
         correct = test(model, device, test_loader)
         if correct>correct_:
             correct_ = correct
-            if args.save_model:
-                torch.save(model.state_dict(), "cifar_cnn_19.pt")
         scheduler.step()
 
     model = fuse_bn_recursively(model)
