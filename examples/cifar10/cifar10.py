@@ -98,7 +98,7 @@ def main():
                         help='Resume model from checkpoint')
     parser.add_argument('--T', type=int, default=1000, metavar='N',
                         help='SNN time window')
-    parser.add_argument('--k', type=int, default=5, metavar='N',
+    parser.add_argument('--k', type=int, default=20, metavar='N',
                         help='Data augmentation')
 
     args = parser.parse_args()
@@ -142,7 +142,7 @@ def main():
         trainset = trainset + datasets.CIFAR10(root='./data', train=True, download=True, transform=im_aug)
     
     train_loader = torch.utils.data.DataLoader(
-        trainset, batch_size=256, shuffle=True)
+        trainset, batch_size=256+512, shuffle=True)
 
     testset = datasets.CIFAR10(
         root='./data', train=False, download=False, transform=transform_test)
@@ -154,7 +154,7 @@ def main():
 
     from models.vgg import VGG, VGG_,CatVGG,CatVGG_
     
-    model = VGG('VGG19', clamp_max=1, quantize_bit=32,bias =True).to(device)
+    model = VGG('VGG19', clamp_max=1, quantize_bit=32,bias =False).to(device)
     snn_model = CatVGG('VGG19', args.T,bias =True).to(device)
 
     #Trainable pooling

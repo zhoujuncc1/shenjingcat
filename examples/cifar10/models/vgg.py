@@ -53,12 +53,11 @@ class VGG(nn.Module):
                 #layers += [nn.AvgPool2d(kernel_size=2, stride=2),nn.Dropout2d(0.3)]
             else:
                 # ReLU()-->Clamp()-->Clamp_q-->fuse bn and dropout
-                layers += [catSNN.QuantizedConv2d(in_channels, x, kernel_size=3, padding=1, bias=self.bias, quantize_bit=quantize_bit),
-                           catSNN.Clamp(max = self.clamp_max)]
+                #layers += [catSNN.QuantizedConv2d(in_channels, x, kernel_size=3, padding=1, bias=self.bias, quantize_bit=quantize_bit),
+                           #catSNN.Clamp(max = self.clamp_max)]
                 #layers += [catSNN.QuantizedConv2d(in_channels, x, kernel_size=3, padding=1, bias=self.bias, quantize_bit=quantize_bit),nn.BatchNorm2d(x),
                             #catSNN.Clamp(max = self.clamp_max),nn.Dropout2d(0.3)]
-                #layers += [catSNN.QuantizedConv2d(in_channels, x, kernel_size=3, padding=1, bias=self.bias, quantize_bit=quantize_bit),nn.BatchNorm2d(x),
-                           #nn.ReLU(),nn.Dropout2d(0.3)]
+                layers += [catSNN.QuantizedConv2d(in_channels, x, kernel_size=3, padding=1, bias=self.bias, quantize_bit=quantize_bit),nn.BatchNorm2d(x),nn.ReLU(),nn.Dropout2d(0.2)]
                 if self.quantize_factor!=-1:
                     layers += [catSNN.Quantize(self.quantize_factor)]
                 in_channels = x
