@@ -166,7 +166,7 @@ def main():
                         help='Resume model from checkpoint')
     parser.add_argument('--T', type=int, default=150, metavar='N',
                         help='SNN time window')
-    parser.add_argument('--k', type=int, default=0, metavar='N',
+    parser.add_argument('--k', type=int, default=50, metavar='N',
                         help='Data augmentation')
     args = parser.parse_args()
     use_cuda = not args.no_cuda and torch.cuda.is_available()
@@ -219,7 +219,7 @@ def main():
     snn_loader = torch.utils.data.DataLoader(snn_dataset, **kwargs)
 
     from models.vgg_ import CatVGG,VGG_
-    model = VGG_('o', clamp_max=1.0, bias = False).to(device)
+    model = VGG_('o', clamp_max=1.0, bias = True).to(device)
     #model.load_state_dict(torch.load("cifar100_vggo_.pt"), strict=False)
     snn_model = CatVGG('o', args.T, is_noise=False, bias = True).to(device)
 
