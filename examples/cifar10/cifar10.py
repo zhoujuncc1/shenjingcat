@@ -78,7 +78,7 @@ def main():
                         help='input batch size for training (default: 64)')
     parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
                         help='input batch size for testing (default: 1000)')
-    parser.add_argument('--epochs', type=int, default=14, metavar='N',
+    parser.add_argument('--epochs', type=int, default=50, metavar='N',
                         help='number of epochs to train (default: 14)')
     parser.add_argument('--lr', type=float, default=1e-3, metavar='LR',
                         help='learning rate (default: 1)')
@@ -98,7 +98,7 @@ def main():
                         help='Resume model from checkpoint')
     parser.add_argument('--T', type=int, default=1000, metavar='N',
                         help='SNN time window')
-    parser.add_argument('--k', type=int, default=20, metavar='N',
+    parser.add_argument('--k', type=int, default=100, metavar='N',
                         help='Data augmentation')
 
     args = parser.parse_args()
@@ -154,8 +154,8 @@ def main():
 
     from models.vgg import VGG, VGG_,CatVGG,CatVGG_
     
-    model = VGG('VGG19', clamp_max=1, quantize_bit=32,bias =False).to(device)
-    snn_model = CatVGG('VGG19', args.T,bias =True).to(device)
+    model = VGG('VGG16', clamp_max=1, quantize_bit=32,bias =False).to(device)
+    snn_model = CatVGG('VGG16', args.T,bias =True).to(device)
 
     #Trainable pooling
     #model = VGG_('VGG19_', clamp_max=1, quantize_bit=32,bias =True).to(device)
