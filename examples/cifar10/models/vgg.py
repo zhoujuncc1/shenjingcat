@@ -87,14 +87,13 @@ class VGG_(nn.Module):
         for x in cfg:
             # [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M']
             if type(x) is tuple:
-                #First Train with VGG (avg_pooling). 
-                # Then freeze convolutional layers and train trainable pooling layer with function "Initialize_trainable_pooling"
                 layers += [nn.Conv2d(x[0], x[1], kernel_size=2, stride = 2, bias=self.bias, groups = x[1]),
                            catSNN.Clamp(max = self.clamp_max)]
-                #layers += [nn.Conv2d(x[0], x[1], kernel_size=2, stride = 2, bias=self.bias, groups = x[1]),catSNN.Clamp(max = self.clamp_max),nn.Dropout2d(0.4)]
+                #layers += [nn.Conv2d(x[0], x[1], kernel_size=2, stride = 2, bias=self.bias, groups = x[1]),catSNN.Clamp(max = self.clamp_max),nn.Dropout2d(0.2)]
             else:
                 layers += [catSNN.QuantizedConv2d(in_channels, x, kernel_size=3, padding=1, bias=self.bias, quantize_bit=quantize_bit),
                            catSNN.Clamp(max = self.clamp_max)]
+                #layers += [catSNN.QuantizedConv2d(in_channels, x, kernel_size=3, padding=1, bias=self.bias, quantize_bit=quantize_bit),catSNN.Clamp(max = self.clamp_max),nn.Dropout2d(0.2)]
                 if self.quantize_factor!=-1:
                     layers += [catSNN.Quantize(self.quantize_factor)]
                 in_channels = x
@@ -125,9 +124,12 @@ class CatVGG(nn.Module):
         for x in cfg:
             if x == 'M':
                 layers += [self.snn.pool(2)]
+                #layers += [self.snn.pool(2),nn.Dropout2d(0)]
             else:
                 layers += [self.snn.conv(in_channels, x, kernelSize=3, padding=1, bias=self.bias),
                         self.snn.spikeLayer()]
+                #layers += [self.snn.conv(in_channels, x, kernelSize=3, padding=1, bias=self.bias),
+                #        self.snn.spikeLayer(),nn.Dropout2d(0)]
                 in_channels = x
         return nn.Sequential(*layers)
  
@@ -154,7 +156,9 @@ class CatVGG_(nn.Module):
         for x in cfg:
             if type(x) is tuple:
                 layers += [self.snn.conv(x[0], x[1], kernelSize=2, stride = 2, bias=self.bias, groups = x[1]),self.snn.spikeLayer()]
+                #layers += [self.snn.conv(x[0], x[1], kernelSize=2, stride = 2, bias=self.bias, groups = x[1]),self.snn.spikeLayer(),nn.Dropout2d(0)]
             else:
                 layers += [self.snn.conv(in_channels, x, kernelSize=3, padding=1, bias=self.bias), self.snn.spikeLayer()]
+                #layers += [self.snn.conv(in_channels, x, kernelSize=3, padding=1, bias=self.bias), self.snn.spikeLayer(),nn.Dropout2d(0)]
                 in_channels = x
         return nn.Sequential(*layers)
