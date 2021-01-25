@@ -49,8 +49,8 @@ class VGG(nn.Module):
             # [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M']
             if x == 'M':
                 #Train the model with dropout
-                layers += [nn.AvgPool2d(kernel_size=2, stride=2)]
-                #layers += [nn.AvgPool2d(kernel_size=2, stride=2),nn.Dropout2d(0.3)]
+                #layers += [nn.AvgPool2d(kernel_size=2, stride=2)]
+                layers += [nn.AvgPool2d(kernel_size=2, stride=2),nn.Dropout2d(0.3)]
             else:
                 # ReLU()-->Clamp()-->Clamp_q-->fuse bn and dropout
                 #layers += [catSNN.QuantizedConv2d(in_channels, x, kernel_size=3, padding=1, bias=self.bias, quantize_bit=quantize_bit),
@@ -123,13 +123,13 @@ class CatVGG(nn.Module):
         in_channels = 3
         for x in cfg:
             if x == 'M':
-                layers += [self.snn.pool(2)]
-                #layers += [self.snn.pool(2),nn.Dropout2d(0)]
+                #layers += [self.snn.pool(2)]
+                layers += [self.snn.pool(2),nn.Dropout2d(0)]
             else:
-                layers += [self.snn.conv(in_channels, x, kernelSize=3, padding=1, bias=self.bias),
-                        self.snn.spikeLayer()]
                 #layers += [self.snn.conv(in_channels, x, kernelSize=3, padding=1, bias=self.bias),
-                #        self.snn.spikeLayer(),nn.Dropout2d(0)]
+                #        self.snn.spikeLayer()]
+                layers += [self.snn.conv(in_channels, x, kernelSize=3, padding=1, bias=self.bias),
+                        self.snn.spikeLayer(),nn.Dropout2d(0)]
                 in_channels = x
         return nn.Sequential(*layers)
  
