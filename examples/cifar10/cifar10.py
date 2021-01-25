@@ -179,7 +179,7 @@ def main():
     model = fuse_bn_recursively(model)
     transfer_model(model, snn_model)
     with torch.no_grad():
-        normalize_weight(snn_model.features, quantize_bit=8)
+        normalize_weight(snn_model.features, quantize_bit=32)
     test(snn_model, device, snn_loader)
 
 
