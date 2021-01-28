@@ -6,8 +6,8 @@ The repository includes C++ and CUDA code that has to be compiled and installed 
 
 `python setup.py install`
 
-## Usage
-ShenjingCat is for the simulation of SNN with weight transferred from ANN training.
+## Documentation
+Please refer to the [wiki](https://github.com/zhoujuncc1/shenjingcat/wiki)
 
 ## Training Workflow
 CQ Trainig is trained in stages as the figure below. The details of training methods is in [learning_tricks.md](https://github.com/zhoujuncc1/shenjingcat/blob/master/docs/learning_tricks.md).
