@@ -179,7 +179,6 @@ def main():
     
     model = VGG_o('o', clamp_max=1,bias =True).to(device)
     snn_model = CatVGG_o('o', args.T,bias =True).to(device)
-    #model.load_state_dict(torch.load("cifar_cnn_o_10_9396.pt"), strict=False)
 
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
