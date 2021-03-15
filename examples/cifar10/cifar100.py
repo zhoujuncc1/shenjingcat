@@ -146,10 +146,10 @@ def main():
                         help='input batch size for training (default: 64)')
     parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
                         help='input batch size for testing (default: 1000)')
-    parser.add_argument('--epochs', type=int, default=0, metavar='N',
+    parser.add_argument('--epochs', type=int, default=14, metavar='N',
                         help='number of epochs to train (default: 14)')
     parser.add_argument('--lr', type=float, default=1e-3, metavar='LR',
-                        help='learning rate (default: 1)')
+                        help='learning rate (default: 1e-3)')
     parser.add_argument('--gamma', type=float, default=0.7, metavar='M',
                         help='Learning rate step gamma (default: 0.7)')
     parser.add_argument('--no-cuda', action='store_true', default=False,
@@ -166,7 +166,7 @@ def main():
                         help='Resume model from checkpoint')
     parser.add_argument('--T', type=int, default=150, metavar='N',
                         help='SNN time window')
-    parser.add_argument('--k', type=int, default=50, metavar='N',
+    parser.add_argument('--k', type=int, default=1, metavar='N',
                         help='Data augmentation')
     args = parser.parse_args()
     use_cuda = not args.no_cuda and torch.cuda.is_available()
