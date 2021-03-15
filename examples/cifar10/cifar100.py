@@ -166,7 +166,7 @@ def main():
                         help='Resume model from checkpoint')
     parser.add_argument('--T', type=int, default=150, metavar='N',
                         help='SNN time window')
-    parser.add_argument('--k', type=int, default=1, metavar='N',
+    parser.add_argument('--k', type=int, default=50, metavar='N',
                         help='Data augmentation')
     args = parser.parse_args()
     use_cuda = not args.no_cuda and torch.cuda.is_available()
