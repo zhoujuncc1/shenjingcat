@@ -256,7 +256,7 @@ def main():
 
     device = torch.device("cuda" if use_cuda else "cpu")
     
-    f = np.load('dataeeg/eeg1201_r57_b_hamming_5s_2_c_arousal.npz')
+    f = np.load('dataeeg/arousal.npz')
     X_train_ = f['X_train_']
     y_train_ = f['y_train_']
     X_test = f['X_test']
