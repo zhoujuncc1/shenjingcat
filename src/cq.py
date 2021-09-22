@@ -57,3 +57,10 @@ class QuantizedConv2d(nn.Conv2d):
                             _pair(0), self.dilation, self.groups)
         return F.conv2d(input, quantize_to_bit(self.weight, self.quantize_bit), self.bias, self.stride,
                         self.padding, self.dilation, self.groups)
+
+class QuantizedLinear(nn.Linear):
+    def __init__(self, in_features, out_features, quantize_bit = 32, bias=True, device=None, dtype=None):
+        super(QuantizedLinear, self).__init__(in_features, out_features, bias, device, dtype)
+        self.quantize_bit=quantize_bit
+    def forward(self, input):
+        return F.linear(input, quantize_to_bit(self.weight, self.quantize_bit), self.bias)

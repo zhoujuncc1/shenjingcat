@@ -12,121 +12,121 @@ class spikeLayer(torch.nn.Module):
     def __init__(self, T):
         super(spikeLayer, self).__init__()
         self.T = T
+
+def dense(inFeatures, outFeatures, weightScale=1, bias=False):   # default weight scaling of 10
+    '''
+    Returns a function that can be called to apply dense layer mapping to input tensor per time instance.
+    It behaves similar to ``torch.nn.Linear`` applied for each time instance.
+
+    Arguments:
+        * ``inFeatures`` (``int``, tuple of two ints, tuple of three ints): 
+            dimension of input features (Width, Height, Channel) that represents the number of input neurons.
+        * ``outFeatures`` (``int``): number of output neurons.
+        * ``weightScale``: sale factor of default initialized weights. Default: 10
+
+    Usage:
     
-    def dense(self, inFeatures, outFeatures, weightScale=1, bias=False):   # default weight scaling of 10
-        '''
-        Returns a function that can be called to apply dense layer mapping to input tensor per time instance.
-        It behaves similar to ``torch.nn.Linear`` applied for each time instance.
+    >>> fcl = snnLayer.dense(2048, 512)          # takes (N, 2048, 1, 1, T) tensor
+    >>> fcl = snnLayer.dense((128, 128, 2), 512) # takes (N, 2, 128, 128, T) tensor
+    >>> output = fcl(input)                      # output will be (N, 512, 1, 1, T) tensor
+    '''
+    return _denseLayer(inFeatures, outFeatures, weightScale, bias)
 
-        Arguments:
-            * ``inFeatures`` (``int``, tuple of two ints, tuple of three ints): 
-              dimension of input features (Width, Height, Channel) that represents the number of input neurons.
-            * ``outFeatures`` (``int``): number of output neurons.
-            * ``weightScale``: sale factor of default initialized weights. Default: 10
+def conv(inChannels, outChannels, kernelSize, stride=1, padding=0, dilation=1, groups=1, weightScale=1, bias=False):    # default weight scaling of 100
+    '''
+    Returns a function that can be called to apply conv layer mapping to input tensor per time instance.
+    It behaves same as ``torch.nn.conv2d`` applied for each time instance.
 
-        Usage:
+    Arguments:
+        * ``inChannels`` (``int``): number of channels in input
+        * ``outChannels`` (``int``): number of channls produced by convoluion
+        * ``kernelSize`` (``int`` or tuple of two ints): size of the convolving kernel
+        * ``stride`` (``int`` or tuple of two ints): stride of the convolution. Default: 1
+        * ``padding`` (``int`` or tuple of two ints):   zero-padding added to both sides of the input. Default: 0
+        * ``dilation`` (``int`` or tuple of two ints): spacing between kernel elements. Default: 1
+        * ``groups`` (``int`` or tuple of two ints): number of blocked connections from input channels to output channels. Default: 1
+        * ``weightScale``: sale factor of default initialized weights. Default: 100
+
+    The parameters ``kernelSize``, ``stride``, ``padding``, ``dilation`` can either be:
+
+    - a single ``int`` -- in which case the same value is used for the height and width dimension
+    - a ``tuple`` of two ints -- in which case, the first `int` is used for the height dimension,
+        and the second `int` for the width dimension
+
+    Usage:
+
+    >>> conv = snnLayer.conv(2, 32, 5) # 32C5 flter
+    >>> output = conv(input)           # must have 2 channels
+    '''
+    return _convLayer(inChannels, outChannels, kernelSize, stride, padding, dilation, groups, weightScale, bias) 
+
+def pool(kernelSize, stride=None, padding=0, dilation=1, weight=None, theta=1.0):
+    '''
+    Returns a function that can be called to apply pool layer mapping to input tensor per time instance.
+    It behaves same as ``torch.nn.``:sum pooling applied for each time instance.
+
+    Arguments:
+        * ``kernelSize`` (``int`` or tuple of two ints): the size of the window to pool over
+        * ``stride`` (``int`` or tuple of two ints): stride of the window. Default: `kernelSize`
+        * ``padding`` (``int`` or tuple of two ints): implicit zero padding to be added on both sides. Default: 0
+        * ``dilation`` (``int`` or tuple of two ints): a parameter that controls the stride of elements in the window. Default: 1
         
-        >>> fcl = snnLayer.dense(2048, 512)          # takes (N, 2048, 1, 1, T) tensor
-        >>> fcl = snnLayer.dense((128, 128, 2), 512) # takes (N, 2, 128, 128, T) tensor
-        >>> output = fcl(input)                      # output will be (N, 512, 1, 1, T) tensor
-        '''
-        return _denseLayer(inFeatures, outFeatures, weightScale, bias)
+    The parameters ``kernelSize``, ``stride``, ``padding``, ``dilation`` can either be:
 
-    def conv(self, inChannels, outChannels, kernelSize, stride=1, padding=0, dilation=1, groups=1, weightScale=1, bias=False):    # default weight scaling of 100
-        '''
-        Returns a function that can be called to apply conv layer mapping to input tensor per time instance.
-        It behaves same as ``torch.nn.conv2d`` applied for each time instance.
+    - a single ``int`` -- in which case the same value is used for the height and width dimension
+    - a ``tuple`` of two ints -- in which case, the first `int` is used for the height dimension,
+        and the second `int` for the width dimension
 
-        Arguments:
-            * ``inChannels`` (``int``): number of channels in input
-            * ``outChannels`` (``int``): number of channls produced by convoluion
-            * ``kernelSize`` (``int`` or tuple of two ints): size of the convolving kernel
-            * ``stride`` (``int`` or tuple of two ints): stride of the convolution. Default: 1
-            * ``padding`` (``int`` or tuple of two ints):   zero-padding added to both sides of the input. Default: 0
-            * ``dilation`` (``int`` or tuple of two ints): spacing between kernel elements. Default: 1
-            * ``groups`` (``int`` or tuple of two ints): number of blocked connections from input channels to output channels. Default: 1
-            * ``weightScale``: sale factor of default initialized weights. Default: 100
+    Usage:
 
-        The parameters ``kernelSize``, ``stride``, ``padding``, ``dilation`` can either be:
+    >>> pool = snnLayer.pool(4) # 4x4 pooling
+    >>> output = pool(input)
+    '''
+    return _poolLayer(theta, kernelSize, stride, padding, dilation, weight)
 
-        - a single ``int`` -- in which case the same value is used for the height and width dimension
-        - a ``tuple`` of two ints -- in which case, the first `int` is used for the height dimension,
-          and the second `int` for the width dimension
+def dropout(p=0.5, inplace=False):
+    '''
+    Returns a function that can be called to apply dropout layer to the input tensor.
+    It behaves similar to ``torch.nn.Dropout``.
+    However, dropout over time dimension is preserved, i.e.
+    if a neuron is dropped, it remains dropped for entire time duration.
 
-        Usage:
+    Arguments:
+        * ``p``: dropout probability.
+        * ``inplace`` (``bool``): inplace opeartion flag.
 
-        >>> conv = snnLayer.conv(2, 32, 5) # 32C5 flter
-        >>> output = conv(input)           # must have 2 channels
-        '''
-        return _convLayer(inChannels, outChannels, kernelSize, stride, padding, dilation, groups, weightScale, bias) 
+    Usage:
 
-    def pool(self, kernelSize, stride=None, padding=0, dilation=1, weight=None, theta=1.0):
-        '''
-        Returns a function that can be called to apply pool layer mapping to input tensor per time instance.
-        It behaves same as ``torch.nn.``:sum pooling applied for each time instance.
-
-        Arguments:
-            * ``kernelSize`` (``int`` or tuple of two ints): the size of the window to pool over
-            * ``stride`` (``int`` or tuple of two ints): stride of the window. Default: `kernelSize`
-            * ``padding`` (``int`` or tuple of two ints): implicit zero padding to be added on both sides. Default: 0
-            * ``dilation`` (``int`` or tuple of two ints): a parameter that controls the stride of elements in the window. Default: 1
-            
-        The parameters ``kernelSize``, ``stride``, ``padding``, ``dilation`` can either be:
-
-        - a single ``int`` -- in which case the same value is used for the height and width dimension
-        - a ``tuple`` of two ints -- in which case, the first `int` is used for the height dimension,
-          and the second `int` for the width dimension
-
-        Usage:
-
-        >>> pool = snnLayer.pool(4) # 4x4 pooling
-        >>> output = pool(input)
-        '''
-        return _poolLayer(theta, kernelSize, stride, padding, dilation, weight)
-
-    def dropout(self, p=0.5, inplace=False):
-        '''
-        Returns a function that can be called to apply dropout layer to the input tensor.
-        It behaves similar to ``torch.nn.Dropout``.
-        However, dropout over time dimension is preserved, i.e.
-        if a neuron is dropped, it remains dropped for entire time duration.
-
-        Arguments:
-            * ``p``: dropout probability.
-            * ``inplace`` (``bool``): inplace opeartion flag.
-
-        Usage:
-
-        >>> drop = snnLayer.dropout(0.2)
-        >>> output = drop(input)
-        '''
-        return _dropoutLayer(p, inplace)
-
-    
-    def spike(self, membranePotential, theta=1.0):
-        '''
-        Applies spike function and refractory response.
-        The output tensor dimension is same as input.
-        ``membranePotential`` will reflect spike and refractory behaviour as well.
-
-        Arguments:
-            * ``membranePotential``: subthreshold membrane potential.
-
-        Usage:
-
-        >>> outSpike = snnLayer.spike(membranePotential)
-        '''
-        return _spikeFunction.apply(membranePotential, theta)
-    
-    def spikeLayer(self, theta=1.0):
-        return _spikeLayer(theta)
+    >>> drop = snnLayer.dropout(0.2)
+    >>> output = drop(input)
+    '''
+    return _dropoutLayer(p, inplace)
 
 
-    def sum_spikes(self, x):
-        result = torch.sum(x, dim=[i for i in range(2, len(x.shape))])
-        return result
-    def sum_spikes_layer(self):
-        return _sumSpikeLayer()
+def spike(membranePotential, theta=1.0):
+    '''
+    Applies spike function and refractory response.
+    The output tensor dimension is same as input.
+    ``membranePotential`` will reflect spike and refractory behaviour as well.
+
+    Arguments:
+        * ``membranePotential``: subthreshold membrane potential.
+
+    Usage:
+
+    >>> outSpike = snnLayer.spike(membranePotential)
+    '''
+    return _spikeFunction.apply(membranePotential, theta)
+
+def spikeLayer(theta=1.0):
+    return _spikeLayer(theta)
+
+
+def sum_spikes(x):
+    result = torch.sum(x, dim=[i for i in range(2, len(x.shape))])
+    return result
+def sum_spikes_layer():
+    return _sumSpikeLayer()
 
 class _denseLayer(nn.Conv3d):
     def __init__(self, inFeatures, outFeatures, weightScale=1, bias=False):
