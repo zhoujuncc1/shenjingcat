@@ -123,11 +123,11 @@ def main():
     transform = transforms.Compose([
         transforms.ToTensor(),
         ])
-    trainset = datasets.MNIST(
+    trainset = datasets.FashionMNIST(
         root='/home/jun/data', train=True, download=True, transform=transform)
     train_loader = torch.utils.data.DataLoader(trainset, batch_size=args.batch_size, shuffle=True)
 
-    testset = datasets.MNIST(
+    testset = datasets.FashionMNIST(
         root='/home/jun/data', train=False, download=False, transform=transform)
     test_loader = torch.utils.data.DataLoader(
         testset, batch_size=args.test_batch_size, shuffle=False)
