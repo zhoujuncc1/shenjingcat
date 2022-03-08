@@ -2,6 +2,18 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+class Quantization(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, tensor, constant=100):
+        ctx.constant = constant
+        return torch.div(torch.floor(torch.mul(tensor, constant)), constant)
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        return F.hardtanh(grad_output), None 
+
+Quantization_ = Quantization.apply
+
 class Quantize(nn.Module):
     def __init__(self, factor):
         super(Clamp, self).__init__()
@@ -29,14 +41,15 @@ class Clamp(nn.Module):
         return torch.clamp(x, min=self.min, max=self.max)
 
 class Clamp_q(nn.Module):
-    def __init__(self, min=0.0, max=1.0):
+    def __init__(self, min=0.0, max=1.0,q_level = 100):
         super(Clamp_q, self).__init__()
         self.min = min
         self.max = max
+        self.q_level = q_level
 
     def forward(self, x):
         x = torch.clamp(x, min=self.min, max=self.max)
-        x = torch.div(torch.round(torch.mul(x, 100.0)), 100.0)
+        x = Quantization_(x, self.q_level)
         return x
 
 class QuantizedConv2d(nn.Conv2d):
