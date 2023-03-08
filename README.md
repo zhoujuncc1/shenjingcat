@@ -10,7 +10,7 @@ The repository includes C++ and CUDA code that has to be compiled and installed 
 Please refer to the [wiki](https://github.com/zhoujuncc1/shenjingcat/wiki)
 
 ## Training Workflow
-CQ Trainig is trained in stages as the figure below. The details of training methods are mentioned in Section4.1 in the paper.
+CQ Trainig is trained in stages as the figure below. 
 
 
 <img src="https://github.com/zhoujuncc1/shenjingcat/raw/master/workflow_whole.jpg" width=500>
